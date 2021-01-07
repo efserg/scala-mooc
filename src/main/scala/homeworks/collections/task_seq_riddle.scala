@@ -19,7 +19,15 @@ object task_seq_riddle {
    * */
 
   def nextLine(currentLine: List[Int]): List[Int] =
-    task"Реализуйте функцию генерирующую след последовательность из текущей"()
+    currentLine match {
+      case Nil => Nil
+      case head :: Nil => head :: 1 :: Nil
+      case head :: tail =>
+        tail.foldLeft(List(head, 1)) { (acc, x) =>
+          if (acc.head == x) acc.head :: (acc.tail.head + 1) :: acc.tail.tail
+          else x :: 1 :: acc
+        }.reverse
+    }
 
   /**
    * 2. Реализуйте ленивый список, который генерирует данную последовательность
@@ -29,6 +37,5 @@ object task_seq_riddle {
    *
    */
 
-  val funSeq: LazyList[List[Int]] =
-    task"Реализуйте ленивый список, который генерирует данную последовательность"()
+  val funSeq: LazyList[List[Int]] = List(1) #:: funSeq.map(nextLine)
 }
