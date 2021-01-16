@@ -3,6 +3,7 @@ package homeworks.futures
 import homeworks.HomeworksUtils.TaskSyntax
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Failure, Success, Try}
 
 object task_futures_sequence {
 
@@ -21,5 +22,11 @@ object task_futures_sequence {
    */
   def fullSequence[A](futures: List[Future[A]])
                      (implicit ex: ExecutionContext): Future[(List[A], List[Throwable])] =
-    task"Реализуйте метод `fullSequence`"()
+    futures match {
+      case Nil => Future.successful((List.empty[A], List.empty[Throwable]))
+      case x :: xs => x.flatMap(v => fullSequence(xs).map(x => (v :: x._1, x._2)))
+        .recoverWith {
+          e: Throwable => fullSequence(xs).map(x => (x._1, e :: x._2))
+        }
+    }
 }
